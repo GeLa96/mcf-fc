@@ -13,8 +13,8 @@ background <- read_excel("ecb.CES_data_2024_monthly.august.xlsx", sheet = "ecb.C
 
 merged <- merge(monthly, background, by = c(
   "a0010", # Respondent ID
-  "a0020"
-)) # Country code
+  "a0020" # Country code
+))
 
 dim(merged) # the two key columns are 'a0010' and 'a0020' are not duplicated, therefore we get 162 columns.
 head(names(merged), 20)
@@ -41,11 +41,12 @@ p_edu <- ggplot(austria_data, aes(
   ),
   y = c1120
 )) +
-  geom_boxplot(fill = "red") +
+  geom_boxplot(fill = "red", outlier.shape = NA, linewidth = 0.4) +
+  coord_cartesian(ylim = c(-5, 20)) +
   labs(
     x = "Education Level (ISCED)",
     y = "One Year Ahead Inflation Expectations (c1120)",
-    title = "Inflation Expectations by Education Level in Austria (CES 2024)"
+    # title = "Inflation Expectations by Education Level in Austria (CES 2024)"
   ) +
   theme_minimal()
 ggsave("education_plot_austria.png", plot = p_edu, width = 7, height = 5, dpi = 300)
@@ -68,7 +69,7 @@ p_extr <- ggplot(austria_data, aes(x = c1020, y = c1120)) +
   labs(
     x = "Perceived past 12-month inflation (%) (C1020)",
     y = "Expected 1-year-ahead inflation (%) (C1120)",
-    title = "Austria: Extrapolation pattern (perceived vs. expected inflation)"
+    # title = "Austria: Extrapolation pattern (perceived vs. expected inflation)"
   ) +
   theme_minimal()
 ggsave("extrapolation_plot_austria.png", plot = p_extr, width = 7, height = 5, dpi = 300)
@@ -205,7 +206,8 @@ stargazer(
 ## Expectation of prices in general next 12 months - open - ended "c1120"
 c1120_all <- merged$c1120
 # count for specifice values
-values_count <- c(-10, -5, 0, 5, 10, 15, 20)
+# values_count <- c(-10, -5, 0, 5, 10, 15, 20)
+values_count <- c(0, 5, 10)
 counts <- sapply(values_count, function(x) sum(c1120_all == x, na.rm = TRUE))
 c1120_all_counts <- data.frame(Value = values_count, Count = counts)
 print(c1120_all_counts)
@@ -215,10 +217,6 @@ total_valid <- sum(!is.na(c1120_all))
 
 # the ratio of these answers is 32 percent which is quite high.
 ratio <- total_focal / total_valid
-print(ratio)
-
-
-ratio <- length(c1120_all_counts) / length(c1120_all)
 print(ratio)
 
 
@@ -239,7 +237,8 @@ print(p1)
 ## Expecations of prices in general 3 years ahead - open - ended "c1220"
 c1220_all <- merged$c1220
 
-values_count <- c(-10, -5, 0, 5, 10, 15, 20)
+# values_count <- c(-10, -5, 0, 5, 10, 15, 20)
+values_count <- c(0, 5, 10)
 counts <- sapply(values_count, function(x) sum(c1220_all == x, na.rm = TRUE))
 c1220_all_counts <- data.frame(Value = values_count, Count = counts)
 print(c1120_all_counts)
@@ -269,16 +268,16 @@ print(p2)
 ggplot() +
   geom_density(aes(x = c1120_all, color = "1 Year Ahead"), size = 0.4) +
   geom_density(aes(x = c1220_all, color = "3 Years Ahead"), size = 0.4) +
-  geom_vline(xintercept = c(0, 5, 10, 15), linetype = "dashed", color = "grey40", linewidth = 0.2) +
+  geom_vline(xintercept = c(0, 5, 10, 15), linetype = "dashed", color = "black", linewidth = 0.2) +
   annotate("text",
     x = c(0, 5, 10, 15), y = -0.005, # adjust y for position
     label = c("0", "5", "10", "15"),
-    angle = 90, vjust = -0.5, size = 2.5, color = "grey40"
+    angle = 90, vjust = -0.5, size = 3, color = "black"
   ) +
   labs(
     x = "Inflation Expectations (%)",
     y = "Density",
-    title = "Density of Inflation Expectations: 1 Year vs. 3 Years Ahead (CES 2024)"
+    # title = "Density of Inflation Expectations: 1 Year vs. 3 Years Ahead (CES 2024)"
   ) +
   scale_color_manual(name = "Horizon", values = c("1 Year Ahead" = "blue", "3 Years Ahead" = "green")) +
   theme_minimal()

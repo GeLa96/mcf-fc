@@ -1,0 +1,56 @@
+library(tidyverse)
+library(janitor)
+library(readr)
+library(dplyr)
+library(zoo)
+library(ggplot2)
+library(tidyr)
+library(gridExtra)
+library(seasonal)
+
+
+E_pi <- read.csv("EA_pi.csv")
+E_unemp <- read.csv("EA_unemp.csv")
+E_energy <- read.csv("EA_energy.csv")
+
+EA <- E_pi %>% select(-1) %>% mutate(
+  TIME.PERIOD = gsub("Q", "-Q", TIME.PERIOD),        # make it "1997-Q1"
+  TIME.PERIOD = as.yearqtr(TIME.PERIOD, format = "%Y-Q%q"),  # convert to yearqtr class
+  TIME.PERIOD = as.Date(TIME.PERIOD)                 # turns it into first day of quarter
+)
+glimpse(EA)
+
+EA <- 
+
+
+EA_merged <- EA_merged %>%
+  select(-1) %>%  # drop first column
+  mutate(
+    TIME.PERIOD = gsub("Q", "-Q", TIME.PERIOD),        # make it "1997-Q1"
+    TIME.PERIOD = as.yearqtr(TIME.PERIOD, format = "%Y-Q%q"),  # convert to yearqtr class
+    TIME.PERIOD = as.Date(TIME.PERIOD)                 # turns it into first day of quarter
+  )
+
+  library(dplyr)
+
+# Identify the join keys (first, second, and last columns from EA_pi)
+keys <- names(E_pi)[c(1, 2, ncol(E_pi))]
+
+# Extract only the column you need from each dataset
+E_energy_small <- E_energy %>% select(all_of(keys), energy = 4) # assumes energy is col 4
+E_unemp_small  <- E_unemp %>%  select(all_of(keys), unemp = 4)  # assumes unemp is col 4
+
+# Merge step by step — keeping **all columns from EA_pi**
+E_merged <- E_pi %>%
+  left_join(E_energy_small, by = keys) %>%
+  left_join(E_unemp_small,  by = keys)
+  
+
+glimpse(E_energy)
+View()
+View(E_pi)
+
+EA <- read.csv("EA.csv")
+View(EA)
+EA <- EA %>% select(-2) %>% mutate(DATE = as.Date(DATE)) %>% filter(DATE >= as.Date("2000-01-01"))
+glimpse(EA)

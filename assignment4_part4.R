@@ -4,8 +4,7 @@ library(ggplot2)
 
 ## load data
 df <- read.csv2("data_assign4.csv", header = TRUE, sep = ";", dec = ",")
-
-# Do NOT drop first row/column here; we use the first two rows as metadata below.
+View(df)
 
 # Extract metadata
 meta_country <- as.character(df[1, ]) # Country names
@@ -150,8 +149,7 @@ fix_na_seq <- function(x) {
     x
 }
 ### Apply missing value fixing per Country
-df_panel <- df_panel %>%
-    group_by(Country) %>%
+group_by(Country) %>%
     arrange(Year, .by_group = TRUE) %>%
     mutate(
         i    = fix_na_seq(i),
@@ -159,7 +157,7 @@ df_panel <- df_panel %>%
         gdp  = fix_na_seq(gdp)
     ) %>%
     ungroup()
-# View(df_panel)
+View(df_panel)
 
 ## add column real interest rate
 df_panel <- df_panel %>%
